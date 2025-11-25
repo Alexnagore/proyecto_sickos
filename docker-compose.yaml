@@ -1,0 +1,13 @@
+services:
+  sickos:
+    build: ./web
+    container_name: sickos_port
+    ports:
+     - "80:80"
+     - "31337:31337"
+    networks:
+      - hacking_net
+
+networks:
+  hacking_net:
+    driver: bridge
