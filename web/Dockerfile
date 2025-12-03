@@ -1,22 +1,22 @@
 FROM debian:latest
 
 # 1. Instalamos dependencias
+# AÑADIDO: 'net-tools' y 'binutils' para que chkrootkit funcione sin errores
 RUN apt-get update && apt-get install -y \
     lighttpd \
+    lighttpd-mod-webdav \
     php-cgi \
     cron \
     procps \
+    net-tools \
+    binutils \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Activamos PHP (FastCGI)
-# Esto crea enlaces simbólicos que la línea "include_shell" leerá
 RUN lighttpd-enable-mod fastcgi && lighttpd-enable-mod fastcgi-php
 
 # 3. Copiamos los archivos
-# IMPORTANTE: Copiamos el CONTENIDO de tu carpeta 'www' directamente a la raíz '/var/www'
 COPY ./www/ /var/www/
-
-# Copiamos tu configuración corregida
 COPY ./lighttpd.conf /etc/lighttpd/lighttpd.conf
 
 # Copiamos el exploit y el cron
@@ -24,14 +24,18 @@ COPY ./chkrootkit /usr/sbin/chkrootkit
 COPY ./cron_chkrootkit /etc/cron.daily/chkrootkit
 
 # 4. Permisos
-# Damos permisos al usuario www-data sobre la carpeta raíz
-RUN chown -R www-data:www-data /var/www \
+# Creamos la carpeta 'test' y asignamos permisos
+RUN mkdir -p /var/www/test \
+    && chown -R www-data:www-data /var/www \
     && chmod 777 /var/www \
     && chmod 777 /var/www/test
 
-# Permisos de ejecución
+# Permisos de ejecución para el exploit/cron
 RUN chmod +x /usr/sbin/chkrootkit \
     && chmod +x /etc/cron.daily/chkrootkit
 
-# 5. Arrancar
+# 5. [EXTRA] Creamos la flag falsa para simular el final oficial
+RUN echo "ssi{4876c5c9a6420387d66104e5bc32f5d3}" > /root/root.txt
+
+# 6. Arrancar
 CMD service cron start && lighttpd -D -f /etc/lighttpd/lighttpd.conf
