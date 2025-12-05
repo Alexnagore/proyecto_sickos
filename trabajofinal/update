@@ -1,0 +1,2 @@
+#!/bin/bash
+id > /var/www/html/root_flag.txt

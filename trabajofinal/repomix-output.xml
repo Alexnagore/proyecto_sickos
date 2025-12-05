@@ -1,0 +1,447 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+docs/
+  writeUP.md
+  writeUP.md:Zone.Identifier
+flag/
+  flag.txt
+  flag.txt:Zone.Identifier
+  root.txt
+  root.txt:Zone.Identifier
+  user.txt
+  user.txt:Zone.Identifier
+machine/
+  html/
+    templates/
+      flag.html
+      flag.html:Zone.Identifier
+    index.php
+    index.php:Zone.Identifier
+  src/
+    execute.sh
+    execute.sh:Zone.Identifier
+    prepare.sh
+    prepare.sh:Zone.Identifier
+  Dockerfile
+  Dockerfile:Zone.Identifier
+docker-compose.yml
+docker-compose.yml:Zone.Identifier
+README
+README:Zone.Identifier
+remove.sh
+remove.sh:Zone.Identifier
+start.sh
+start.sh:Zone.Identifier
+stop.sh
+stop.sh:Zone.Identifier
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="docs/writeUP.md">
+# Write Up
+
+## Componentes del grupo
+
+Nombre.1 Apellido1.1 Apellido2.1
+Nombre.2 Apellido1.2 Apellido2.2
+
+## Guia de solución de la máquina
+
+bla, bla, bla...
+</file>
+
+<file path="flag/flag.txt">
+ssi{e2fdb6793afe56eb6d52ebd53052498e}
+</file>
+
+<file path="flag/root.txt">
+ssi{4876c5c9a6420387d66104e5bc32f5d3}
+</file>
+
+<file path="flag/user.txt">
+ssi{5b449cd4a190a1ba4ef8c14643f518b2}
+</file>
+
+<file path="machine/html/templates/flag.html">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reto Completado — Retro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+/* --------------------------
+   ESTILO RETRO / PIXEL ART
+   -------------------------- */
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: #33ff33;
+  font-family: "Courier New", monospace;
+  text-shadow: 0 0 4px #33ff33;
+  overflow: hidden;
+}
+
+/* Efecto CRT */
+.crt {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.crt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,255,0,0.07) 0px,
+    rgba(0,255,0,0.07) 2px,
+    rgba(0,0,0,0.2) 3px
+  );
+  pointer-events: none;
+}
+
+.crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(0, 255, 0, 0.12) 0%, rgba(0,0,0,0.9) 80%);
+  pointer-events: none;
+}
+
+/* Contenedor principal */
+.container {
+  position: relative;
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Skull ASCII (animada glitch) */
+#skull {
+  white-space: pre;
+  font-size: 14px;
+  line-height: 14px;
+  margin-bottom: 30px;
+  filter: drop-shadow(0 0 6px #33ff33);
+  animation: skullGlitch 2s infinite;
+}
+
+@keyframes skullGlitch {
+  0% { text-shadow: 0 0 5px #33ff33; }
+  20% { text-shadow: 2px 0 #00ff99, -2px 0 #00ffaa; }
+  40% { text-shadow: -2px 0 #009966, 2px 0 #00ffcc; }
+  60% { text-shadow: 0 0 5px #33ff33; }
+}
+
+/* Título ganador */
+#title {
+  font-size: 32px;
+  margin-bottom: 20px;
+  animation: flicker 2.4s infinite;
+}
+
+@keyframes flicker {
+  0%, 19%, 21%, 60%, 62%, 100% { opacity: 1; }
+  20%, 61% { opacity: 0.4; }
+}
+
+/* Flag revelada */
+#flag {
+  margin-top: 35px;
+  font-size: 20px;
+  opacity: 0;
+  animation: reveal 1s ease-out forwards 2.4s;
+  padding: 10px 20px;
+  border: 1px solid #33ff33;
+  display: inline-block;
+  background: rgba(0,255,0,0.05);
+}
+
+@keyframes reveal {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Glitch de la flag antes de aparecer */
+.glitch {
+  animation: glitchEffect 0.55s steps(2, end) infinite;
+}
+
+@keyframes glitchEffect {
+  0% { text-shadow: 2px 0 #00ff66; }
+  50% { text-shadow: -2px 0 #009944; }
+  100% { text-shadow: 2px 0 #00ff66; }
+}
+
+/* Partículas retro verdes */
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+/* Scroll deshabilitado */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+</style>
+</head>
+<body>
+
+<div class="crt">
+  <div class="container">
+
+<pre id="skull">
+      ████████████████████
+    ████████████████████████
+   ████████▀▀▀      ▀▀▀██████
+  ██████▀                ▀████
+ █████▀   ▄████▄  ▄████▄   ▀████
+ ████   ▄███████  ███████▄   ███
+ ███   █████████  █████████   ███
+ ███                          ███
+ ███           ▀  ▀           ███
+   ████    ▀ █ ▄     █ █    ████
+   █████▄      █ █ █ ▀   ▄█████
+   ██████▄              ▄██████
+      █████████▄   ▄█████████
+      ██████████████████████
+</pre>
+
+    <div id="title">=== ACCESO CONCEDIDO ===<br>RETO SUPERADO</div>
+
+    <div id="flag" class="">##FLAG##</div>
+
+  </div>
+</div>
+
+<canvas id="particles"></canvas>
+
+<script>
+
+/* --------------------------
+   Partículas retro verdes
+   -------------------------- */
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.onresize = resize;
+
+let particles = [];
+for (let i = 0; i < 140; i++) {
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    s: Math.random()*2 + 1,
+    v: Math.random()*0.6 + 0.2
+  });
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#33ff33";
+  particles.forEach(p => {
+    ctx.fillRect(p.x, p.y, p.s, p.s);
+    p.y += p.v;
+    if (p.y > canvas.height) p.y = -5;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* --------------------------
+   Auto-reveal de la flag
+   -------------------------- */
+
+const flag = document.getElementById("flag");
+
+// Glitch antes de aparecer
+setTimeout(() => {
+  flag.classList.add("glitch");
+}, 300);
+
+// Fija el texto real
+setTimeout(() => {
+  flag.classList.remove("glitch");
+}, 2300);
+
+</script>
+
+</body>
+</html>
+</file>
+
+<file path="machine/html/index.php">
+<?php
+
+	echo str_replace("##FLAG##",file_get_contents("/flag/flag.txt"),file_get_contents("./templates/flag.html"));
+	
+?>
+</file>
+
+<file path="machine/src/execute.sh">
+#! /bin/bash
+
+service apache2 start
+service ssh start
+
+while [ 1 == 1 ]; do
+
+	cat -;
+
+	sleep 1;
+
+done;
+</file>
+
+<file path="machine/src/prepare.sh">
+#! /bin/bash
+apt update && apt install -y sudo passwd ssh php && apt clean
+
+USERNAME="dummy";
+PASSWORD="dummy";
+
+echo "$USERNAME:$PASSWORD:$INITID:$INITID::/home/$USERNAME:/bin/bash" > /root/users.txt
+
+newusers /root/users.txt
+</file>
+
+<file path="machine/Dockerfile">
+# Imagen base mínima
+FROM debian
+
+COPY html /var/www/html/
+COPY src /opt/src/
+
+RUN cd /opt/src/; chmod 777 prepare.sh; ./prepare.sh;
+
+# Comando por defecto al iniciar el contenedor
+CMD ["bash"]
+ENTRYPOINT ["/opt/src/execute.sh"]
+</file>
+
+<file path="docker-compose.yml">
+services:
+  machine1:
+    image: web-machine
+    hostname: web-machine
+    build: machine
+    volumes:
+      - ./flag:/flag
+    ports:
+      - 8080:80
+    networks:
+      - internal_net
+
+networks:
+  internal_net:
+    driver: bridge
+</file>
+
+<file path="README">
+# Informacion sobre el docker compose
+
+Para utilizar la maquina deberemos situarnos en el directorio donde está leyedo este documento.
+
+Scripts de maquinas:
+* Para iniciar la maquina de prueba ejecutar start.sh y conectarse al puerto 8080 de localhost.
+* Para parar la maquina de prueba ejecutar stop.sh
+* Para borrar del sistema la maquina de prueba ejecutar remove.sh
+
+# archivo dockercompose.yml
+
+* En el archivo docker-compose.yml hay una definicion de un sistema compuesto por una maquina. Si el sistema que se está haciendo necesita de mas de una maquina, deberán añadirse maquinas. Todas ellas derivadas de la maquina base llamada machine. 
+
+* Todas las máquinas se incorporarán en la misma red, el sistema predefinido está preparado para compartir el puerto 80 de la máquina en el 8080 de la máquina host. Si se va a realizar un sistema que necesite de mas puertos abiertos deberá incorporar una máquina adicional que haga de pivote y compartir el puerto 22 de esa maquina en lugar del 80.
+
+## Preparación de cada maquina particular (machine)
+
+Existe un directorio machine/src con dos archivos:
+* execute.sh: Es el script que se va a ejecutar cuando se ponga en marcha la máquina. Deberá iniciar los servidores y quedarse en un bucle infinito.
+* prepare.sh: Es el script que instala todos los programas necesarios en la máquina y prepara el sistema. Ahi estan acciones como apt install o cambios en los archivos de configuracion necesarios para crear la máquina.
+
+## Flags
+
+Por defecto el sistema está puesto para que se comparta la flag del directorio **./flag/** llamada **flag.txt**
+
+## Documentacion
+
+En el directorio **./docs** se pondrán los documentos para entregar, el write up y la documentación adicional necesaria.
+</file>
+
+<file path="remove.sh">
+docker compose -p web-lab down --rmi all
+</file>
+
+<file path="start.sh">
+#! /bin/bash
+echo $RANDOM | md5sum  | awk '{print "ssi{"$1"}"}' > flag/user.txt
+echo $RANDOM | md5sum  | awk '{print "ssi{"$1"}"}' > flag/root.txt
+echo $RANDOM | md5sum  | awk '{print "ssi{"$1"}"}' > flag/flag.txt
+
+docker compose -p web-lab up -d
+</file>
+
+<file path="stop.sh">
+docker compose -p web-lab stop
+</file>
+
+</files>
