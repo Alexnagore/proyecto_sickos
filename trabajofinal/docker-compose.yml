@@ -8,8 +8,8 @@ services:
     ports:
       - 8080:80
     networks:
-      - internal_net
+      - hacking_net
 
 networks:
-  internal_net:
+  hacking_net:
     driver: bridge

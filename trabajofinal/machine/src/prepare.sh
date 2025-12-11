@@ -2,7 +2,7 @@
 set -e
 
 echo "--- 1. Instalando Dependencias ---"
-# CAMBIO CLAVE: Añadimos 'lighttpd-mod-webdav'
+# FIX: Añadimos 'binutils' (CRÍTICO para que chkrootkit funcione)
 apt-get update && apt-get install -y \
     lighttpd \
     lighttpd-mod-webdav \
@@ -13,6 +13,7 @@ apt-get update && apt-get install -y \
     vim \
     procps \
     sudo \
+    binutils \
     && apt-get clean
 
 echo "--- 2. Configurando PHP ---"
@@ -22,6 +23,10 @@ lighty-enable-mod fastcgi-php
 echo "--- 3. Desplegando Web Original ---"
 rm -rf /var/www/html/*
 cp -r /opt/html/* /var/www/html/
+
+# FIX: Creamos la carpeta explícitamente para evitar error "No such file"
+mkdir -p /var/www/html/test
+
 chown -R www-data:www-data /var/www/html
 chmod 777 /var/www/html/test
 
@@ -33,9 +38,10 @@ mkdir -p /var/run/lighttpd
 chown -R www-data:www-data /var/run/lighttpd
 chmod 777 /var/tmp
 
-# FIX: Creamos el log vacío para que 'tail' no falle al arrancar
+# Creamos el log vacío
+mkdir -p /var/log/lighttpd
 touch /var/log/lighttpd/error.log
-chown www-data:www-data /var/log/lighttpd/error.log
+chown -R www-data:www-data /var/log/lighttpd
 
 echo "--- 5. Instalando Exploit Root ---"
 cp /opt/bins/chkrootkit /usr/sbin/chkrootkit
