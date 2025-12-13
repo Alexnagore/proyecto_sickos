@@ -119,7 +119,7 @@ whoami
 
 Finalmente, se accede a las flags del root:
 ```bash
-cd root
+cd /root
 ls
 cat root.txt
 ```
