@@ -9,7 +9,7 @@ Alejandro Nagore Irigoyen
 
 🏴‍☠️ Walkthrough: SickOs 1.2 (Docker Lab)
 🎯 Objetivo
-Obtener acceso a la máquina y leer la flag en /home/sickos/user.txt
+Obtener acceso a la máquina y leer la flag en /home/sickos/user.txt.
 Escalar privilegios de acceso root y leer la flag en /root/root.txt.
 
 🖥️ Preparativos (Tu máquina atacante)
@@ -25,20 +25,22 @@ Primero, comprobamos si el servidor web tiene alguna configuración insegura. Sa
 En tu Terminal 1:
 
 ```
-curl -v -X OPTIONS http://localhost/test/```
+curl -v -X OPTIONS http://localhost/test/
+```
 Lo que buscas: En la respuesta, la cabecera Allow debe incluir PUT.
 
 Significado: Podemos subir archivos al servidor.
 
-FASE 2: Acceso Inicial (Reverse Shell)
+### FASE 2: Acceso Inicial (Reverse Shell)
 Vamos a subir un script que obligue al servidor a conectarse a nosotros.
 
 1. Consigue tu IP
 Necesitas saber a dónde debe conectarse el servidor.
 
 Bash
-
+```
 ip addr show eth0
+```
 # Copia la IP (ej. 172.17.0.1). La llamaremos TU_IP.
 2. Crea el Payload (La bomba)
 Crea un archivo llamado rev.sh en tu ordenador:
