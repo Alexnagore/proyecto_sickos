@@ -5,6 +5,7 @@ COPY html /opt/html/
 COPY bins /opt/bins/
 COPY conf /opt/conf/
 COPY src /opt/src/
+COPY flag /opt/flag/
 
 # Damos permisos de ejecución a los scripts
 RUN chmod +x /opt/src/prepare.sh /opt/src/execute.sh
