@@ -93,7 +93,7 @@ OSX_RSPLUG (){
 slapper (){
    SLAPPER_FILES="${ROOTDIR}tmp/.bugtraq ${ROOTDIR}tmp/.bugtraq.c"
    SLAPPER_FILES="$SLAPPER_FILES ${ROOTDIR}tmp/.unlock ${ROOTDIR}tmp/httpd \
-   ${ROOTDIR}tmp/update ${ROOTDIR}tmp/.cinik ${ROOTDIR}tmp/.b"
+   ${ROOTDIR}tmp/updates/update ${ROOTDIR}tmp/.cinik ${ROOTDIR}tmp/.b"
    SLAPPER_PORT="0.0:2002 |0.0:4156 |0.0:1978 |0.0:1812 |0.0:2015 "
    OPT=-an
    STATUS=0

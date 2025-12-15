@@ -7,6 +7,9 @@ mkdir -p /var/log/lighttpd
 touch /var/log/lighttpd/error.log
 chown -R www-data:www-data /var/log/lighttpd
 
+ssh-keygen -A
+
+service ssh start
 service cron start
 service lighttpd start
 
