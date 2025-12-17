@@ -69,8 +69,7 @@ nmap -p- -sV -sC VICTIM_ID
 Utilizamos herramientas de fuerza bruta de directorios desde la máquina atacante para descubrir rutas ocultas en el servidor web.
 
 ```bash
-wget https://raw.githubusercontent.com/v0re/dirb/master/wordlists/common.txt
-gobuster dir -u http://VICTIM_ID -w common.txt
+gobuster dir -u http://VICTIM_ID -w /usr/share/wordlists/common.txt
 ```
 
 Se identifica que el directorio `/test/` es accesible y potencialmente vulnerable.
