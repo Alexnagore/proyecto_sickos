@@ -69,7 +69,7 @@ nmap -p- -sV -sC VICTIM_ID
 Utilizamos herramientas de fuerza bruta de directorios desde la máquina atacante para descubrir rutas ocultas en el servidor web.
 
 ```bash
-gobuster dir -u http://VICTIM_ID -w /usr/share/wordlists/common.txt
+gobuster dir -u http://VICTIM_ID -w common.txt
 ```
 
 Se identifica que el directorio `/test/` es accesible y potencialmente vulnerable.
@@ -146,14 +146,14 @@ grep user1 /etc/shadow
 
 Copiamos la línea entera y la guardamos en nuestra máquina local como hash.txt.
 ```bash
-echo "LINEA_COPIADA" > hash.txt
+echo 'LINEA_COPIADA' > hash.txt
 ```
 
 4. Cracking Offline (John the Ripper): Necesitarás tener descargado rockyou.txt.
 Nota:Puedes usar tu crackeador favorito
 
 ```bash
-john-the-ripper --wordlist=rockyou.txt hash.txt
+john --wordlist=rockyou.txt hash.txt
 ```
 
 Resultado: Contraseña encontrada -> rockyou
