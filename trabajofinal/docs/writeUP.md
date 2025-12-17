@@ -161,7 +161,7 @@ Resultado: Contraseña encontrada -> rockyou
 5. Conexión SSH: Nos conectamos con user1. Se expone el SSH en el puerto 2222.
 
 ```bash
-ssh -p 2222 user1@localhost
+ssh user1@VICTIM_IP
 # Password: rockyou
 ```
 6. Captura de Flag: Ya autenticado, podemos ller la flag protegida:
