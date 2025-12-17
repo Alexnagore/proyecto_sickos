@@ -173,8 +173,6 @@ cat /home/user1/user.txt
 ---
 
 ## 🧗 FASE 4: Escalada de Privilegios (Becoming Root)
-Con acceso inicial al sistema, se inicia la fase de escalada de privilegios.
-
 Se detecta que el sistema utiliza una versión vulnerable de **chkrootkit (0.49)** y que este se ejecuta automáticamente mediante tareas programadas.
 ```bash
 /usr/sbin/chkrootkit -V
