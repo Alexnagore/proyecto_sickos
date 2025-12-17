@@ -4,7 +4,6 @@ FROM debian:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 1. Instalar herramientas
-# HE ELIMINADO 'wordlists' DE ESTA LISTA PARA QUE NO FALLE
 RUN apt-get update && apt-get install -y \
     openssh-server \
     curl \
@@ -20,33 +19,37 @@ RUN apt-get update && apt-get install -y \
     john \
     procps \
     sudo \
+    bash-completion \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Descargar e instalar Rockyou manualmente
-# Como Debian no tiene el paquete, lo bajamos de un repositorio de GitHub
-RUN mkdir -p /usr/share/wordlists
-RUN wget https://github.com/praetorian-inc/Hob0Rules/raw/master/wordlists/rockyou.txt.gz -O /usr/share/wordlists/rockyou.txt.gz
-RUN gzip -d /usr/share/wordlists/rockyou.txt.gz
+RUN ln -sf /usr/sbin/john /usr/bin/john
 
-# 3. Configurar SSH y Directorios
-RUN mkdir -p /var/run/sshd
+# 2. Wordlists (rockyou + common)
+RUN mkdir -p /usr/share/wordlists && \
+    wget https://github.com/praetorian-inc/Hob0Rules/raw/master/wordlists/rockyou.txt.gz \
+      -O rockyou.txt.gz && \
+    wget https://raw.githubusercontent.com/v0re/dirb/master/wordlists/common.txt \
+      -O common.txt && \
+    gzip -d /usr/share/wordlists/rockyou.txt.gz
 
-# --- CREACIÓN DEL USUARIO DUMMY ---
-RUN useradd -m -s /bin/bash dummy
-RUN echo 'dummy:palangana' | chpasswd
-RUN usermod -aG sudo dummy
+# 3. Configurar SSH
+RUN mkdir -p /var/run/sshd && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config && \
+    ssh-keygen -A
 
-# Configuraciones SSH
-RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-RUN sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+# 4. Crear usuario dummy
+RUN useradd -m -s /bin/bash dummy && \
+    echo 'dummy:palangana' | chpasswd && \
+    usermod -aG sudo dummy
 
-# Generar claves de host (Vital para que no se cierre la conexión)
-RUN ssh-keygen -A
+# 5. Mejorar entorno Bash del usuario dummy
+RUN echo "if [ -f /etc/bash_completion ]; then . /etc/bash_completion; fi" >> /home/dummy/.bashrc && \
+    echo "export PS1='\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ '" >> /home/dummy/.bashrc && \
+    echo "alias ls='ls --color=auto'" >> /home/dummy/.bashrc && \
+    chown dummy:dummy /home/dummy/.bashrc
 
-# 4. Entorno
+# 6. Entorno y arranque
 WORKDIR /home/dummy
-
-# Exponemos el puerto 22
 EXPOSE 22
-
 CMD ["/usr/sbin/sshd", "-D"]

@@ -56,9 +56,9 @@ touch /etc/cron.d/chkrootkit
 echo "--- 6. Configurando Usuarios y vulnerabilidades ---"
 useradd -m -s /bin/bash sickos
 useradd -m -s /bin/bash user1
-echo "user1:rockyou" | chpasswd
-echo "sickos:sickos" | chpasswd
-echo "root:sickos" | chpasswd
+echo "user1:rockyou" | chpasswd -c MD5
+echo "sickos:sickos" | chpasswd -c MD5
+echo "root:sickos" | chpasswd -c MD5
 
 chown user1:user1 /tmp/updates
 
