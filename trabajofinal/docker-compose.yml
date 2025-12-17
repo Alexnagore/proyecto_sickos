@@ -1,13 +1,17 @@
 services:
-  machine1:
+  machine:
     image: web-machine
     hostname: web-machine
     build: machine
-    volumes:
-      - ./flag:/flag
+    networks:
+      - hacking_net
+
+  attacker:
+    image: debian-attacker
+    hostname: attacker
+    build: attacker
     ports:
-      - 8080:80
-      - 2222:22
+      - "2222:22"
     networks:
       - hacking_net
 

