@@ -59,7 +59,7 @@ Copia la IP obtenida e introdúcela donde veas VICTIM_IP.
 Ejecutamos `nmap` contra la IP objetivo para descubrir puertos abiertos y versiones de servicios.
 
 ```bash
-nmap -p- -sV -sC localhost
+nmap -p- -sV -sC VICTIM_ID
 ```
 **Resultados del análisis:**
 - Se detecta un servicio **HTTP (Puerto 80)**.
