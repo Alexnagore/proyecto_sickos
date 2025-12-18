@@ -13,6 +13,12 @@
 
 ---
 
+## 🚩Comprobación de Flags
+Al levantar el docker, tendrás accesible un comprobador de flags en la dirección:
+```bash
+http://localhost:9090/flags.php
+```
+
 ## 🖥️ Preparativos (Infraestructura de Red)
 La máquina víctima (`web-machine`) **no tiene puertos expuestos** hacia nuestro equipo anfitrión. Para acceder a ella, debemos utilizar técnicas de **Tunneling** y **Pivoting** a través del contenedor `attacker`.
 

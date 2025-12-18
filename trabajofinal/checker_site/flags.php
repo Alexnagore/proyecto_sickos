@@ -321,7 +321,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
     </div>
     
     <script>
-        // Canvas para efecto hacker de escritura
+        // Canvas para efecto hacker de escritura avanzado - líneas por toda la pantalla
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         
@@ -348,65 +348,148 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
             '$ calculating next move',
             '> initializing backdoor',
             '[!] firewall bypassed',
-            '>> encryption cracked'
+            '>> encryption cracked',
+            '$ processing encryption key...',
+            '[*] buffer overflow detected',
+            '>> privilege escalation active',
+            '[+] shell spawned successfully',
+            '$ rewriting system logs',
+            '> cracking password hashes',
+            '[*] injecting malware',
+            '>> accessing root directory',
+            '[+] stealing database',
+            '$ installing backdoor'
         ];
         
-        let textLines = [];
-        let currentText = '';
-        let currentIndex = 0;
-        let charIndex = 0;
-        let lineY = 50;
+        const glitchChars = ['█', '▓', '▒', '░', '▐', '▌', '▞', '▘', '▗', '▝'];
         
-        function getRandomHackerText() {
-            return hackerTexts[Math.floor(Math.random() * hackerTexts.length)];
-        }
-        
-        function addNewLine() {
-            if (lineY > canvas.height - 100) {
-                textLines.shift();
-                textLines.forEach((line, i) => {
-                    line.y -= 25;
-                });
-            } else {
-                lineY += 25;
+        class HackerLine {
+            constructor() {
+                this.text = hackerTexts[Math.floor(Math.random() * hackerTexts.length)];
+                this.x = Math.random() * (canvas.width - 300);
+                this.y = Math.random() * (canvas.height - 100);
+                this.charIndex = 0;
+                this.createdAt = Date.now();
+                this.lifetime = 3000 + Math.random() * 4000; // 3-7 segundos de vida
+                this.displayText = '';
+                this.state = 'writing'; // writing, fading
+                this.opacity = 1;
+                this.isWriting = false;
             }
             
-            currentText = getRandomHackerText();
-            charIndex = 0;
+            update() {
+                const age = Date.now() - this.createdAt;
+                
+                if (this.state === 'writing') {
+                    // Escritura de caracteres
+                    if (!this.isWriting) {
+                        this.isWriting = true;
+                    }
+                    
+                    if (age < this.lifetime * 0.8) {
+                        // Escribir caracteres lentamente
+                        if (this.charIndex < this.text.length) {
+                            this.charIndex += 0.35; // Velocidad de escritura aumentada
+                            this.displayText = this.text.substring(0, Math.floor(this.charIndex));
+                        }
+                    } else {
+                        // Transición a desvanecimiento
+                        this.state = 'fading';
+                        this.fadeStartTime = Date.now();
+                    }
+                } 
+                
+                if (this.state === 'fading') {
+                    const fadeAge = Date.now() - this.fadeStartTime;
+                    const fadeDuration = 800;
+                    this.opacity = Math.max(0, 1 - (fadeAge / fadeDuration));
+                }
+                
+                return this.opacity > 0;
+            }
+            
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#00ff41';
+                ctx.font = '18px "Courier New", monospace';
+                ctx.textAlign = 'left';
+                
+                // Efecto de glitch ocasional
+                let textToDraw = this.displayText;
+                if (this.state === 'writing' && Math.random() < 0.05) {
+                    textToDraw = this.createGlitchEffect(this.displayText);
+                }
+                
+                ctx.fillText(textToDraw, this.x, this.y);
+                
+                // Cursor parpadeante durante escritura
+                if (this.state === 'writing' && this.charIndex < this.text.length) {
+                    const cursorOpacity = (Math.sin(Date.now() / 150) + 1) / 2;
+                    ctx.globalAlpha = this.opacity * cursorOpacity;
+                    ctx.fillText('▌', this.x + ctx.measureText(this.displayText).width, this.y);
+                }
+                
+                ctx.globalAlpha = 1;
+            }
+            
+            createGlitchEffect(text) {
+                let glitched = '';
+                for (let i = 0; i < text.length; i++) {
+                    if (Math.random() < 0.2) {
+                        glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                    } else {
+                        glitched += text[i];
+                    }
+                }
+                return glitched;
+            }
+        }
+        
+        let activeLines = [];
+        let frameCount = 0;
+        
+        function createNewLine() {
+            if (activeLines.length < 50) { // Máximo de líneas simultáneas - aumentado a 50
+                activeLines.push(new HackerLine());
+            }
         }
         
         function animateText() {
-            // Limpiar canvas
+            frameCount++;
+            
+            // Limpiar canvas con efecto scanline
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Dibujar líneas anteriores
-            ctx.fillStyle = '#00ff41';
-            ctx.font = '14px "Courier New"';
-            ctx.textAlign = 'left';
+            // Agregar líneas de escaneo sutiles
+            ctx.strokeStyle = 'rgba(0, 255, 65, 0.03)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.height; i += 2) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
             
-            textLines.forEach(line => {
-                ctx.fillText(line.text, 40, line.y);
+            // Actualizar y dibujar líneas activas
+            activeLines = activeLines.filter(line => {
+                const isAlive = line.update();
+                if (isAlive) {
+                    line.draw();
+                }
+                return isAlive;
             });
             
-            // Escribir carácter actual
-            if (currentText) {
-                if (charIndex < currentText.length) {
-                    currentText = currentText.substring(0, charIndex + 1);
-                    ctx.fillText(currentText, 40, lineY);
-                    charIndex++;
-                    
-                    // Efecto de cursor parpadeante
-                    if (Math.floor(Date.now() / 500) % 2 === 0) {
-                        ctx.fillText('▌', 40 + ctx.measureText(currentText).width, lineY);
-                    }
-                } else if (Math.random() < 0.02) {
-                    // Guardar línea completada y crear nueva
-                    textLines.push({ text: currentText, y: lineY });
-                    addNewLine();
+            // Crear nueva línea más frecuentemente
+            if (frameCount % 10 === 0 && Math.random() < 0.7) {
+                createNewLine();
+            }
+            
+            // Asegurar que siempre hay muchas líneas
+            if (activeLines.length < 20) {
+                for (let i = 0; i < 5; i++) {
+                    createNewLine();
                 }
-            } else {
-                addNewLine();
             }
             
             requestAnimationFrame(animateText);
@@ -418,7 +501,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
             canvas.height = window.innerHeight;
         });
         
-        addNewLine();
+        // Iniciar animación
         animateText();
     </script>
 </body>
