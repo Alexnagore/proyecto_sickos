@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+            background: #000000;
             color: #00ff41;
             font-family: 'Courier New', monospace;
             min-height: 100vh;
@@ -49,27 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
             justify-content: center;
             overflow: hidden;
             position: relative;
-        }
-        
-        /* Efecto de fondo animado */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(0, 255, 65, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.05) 0%, transparent 50%);
-            animation: glow 8s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-        
-        @keyframes glow {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
         }
         
         .container {
@@ -309,9 +288,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
             0% { transform: rotate(360deg); }
             100% { transform: rotate(0deg); }
         }
+        
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
+    <canvas id="particleCanvas"></canvas>
+    
     <div class="corner-decor corner-top-left">◆</div>
     <div class="corner-decor corner-top-right">◆</div>
     <div class="corner-decor corner-bottom-left">◆</div>
@@ -319,7 +310,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
     
     <div class="container">
         <div class="box">
-            <h1>⚔ SICKOS FLAG VALIDATOR ⚔</h1>
+            <h1>💀 SICKOS FLAG VALIDATOR 💀</h1>
             <div class="subtitle">// SISTEMA DE VERIFICACIÓN DE SEGURIDAD //</div>
             <form method="post">
                 <input type="text" name="flag" placeholder="Introduce flag ssi{...}" required>
@@ -328,5 +319,107 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['flag'])) {
             <div class="resultado-container"><?php echo $resultado; ?></div>
         </div>
     </div>
+    
+    <script>
+        // Canvas para efecto hacker de escritura
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const hackerTexts = [
+            '$ analyzing target...',
+            '> initializing connection',
+            '>> establishing tunnel',
+            '[*] system detected',
+            '[+] access granted',
+            '$ scanning vulnerabilities',
+            '> deploying exploit',
+            '[!] breach detected',
+            '>> infiltrating network',
+            '$ extracting data',
+            '[+] payload executed',
+            '> gaining privileges',
+            '[*] root access obtained',
+            '$ dumping credentials',
+            '>> covering tracks',
+            '[+] mission accomplished',
+            '$ calculating next move',
+            '> initializing backdoor',
+            '[!] firewall bypassed',
+            '>> encryption cracked'
+        ];
+        
+        let textLines = [];
+        let currentText = '';
+        let currentIndex = 0;
+        let charIndex = 0;
+        let lineY = 50;
+        
+        function getRandomHackerText() {
+            return hackerTexts[Math.floor(Math.random() * hackerTexts.length)];
+        }
+        
+        function addNewLine() {
+            if (lineY > canvas.height - 100) {
+                textLines.shift();
+                textLines.forEach((line, i) => {
+                    line.y -= 25;
+                });
+            } else {
+                lineY += 25;
+            }
+            
+            currentText = getRandomHackerText();
+            charIndex = 0;
+        }
+        
+        function animateText() {
+            // Limpiar canvas
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibujar líneas anteriores
+            ctx.fillStyle = '#00ff41';
+            ctx.font = '14px "Courier New"';
+            ctx.textAlign = 'left';
+            
+            textLines.forEach(line => {
+                ctx.fillText(line.text, 40, line.y);
+            });
+            
+            // Escribir carácter actual
+            if (currentText) {
+                if (charIndex < currentText.length) {
+                    currentText = currentText.substring(0, charIndex + 1);
+                    ctx.fillText(currentText, 40, lineY);
+                    charIndex++;
+                    
+                    // Efecto de cursor parpadeante
+                    if (Math.floor(Date.now() / 500) % 2 === 0) {
+                        ctx.fillText('▌', 40 + ctx.measureText(currentText).width, lineY);
+                    }
+                } else if (Math.random() < 0.02) {
+                    // Guardar línea completada y crear nueva
+                    textLines.push({ text: currentText, y: lineY });
+                    addNewLine();
+                }
+            } else {
+                addNewLine();
+            }
+            
+            requestAnimationFrame(animateText);
+        }
+        
+        // Redimensionar canvas cuando cambia la ventana
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        addNewLine();
+        animateText();
+    </script>
 </body>
 </html>
